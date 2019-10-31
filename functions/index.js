@@ -1,26 +1,33 @@
 const { dialogflow, SimpleResponse} = require('actions-on-google');
 const functions = require('firebase-functions');
 
+const Request = require('./connection/request');
+
 const app = dialogflow({ debug: true });
 
-const actions = require('./actions.js')
+const API_URL = 'https://polarisai.azurewebsites.net/query/';
+
 
 app.intent('Let me make a request', (conv) => {
-    input = conv.ask("Surely! What do you want?");
-    data = await connectToApi(input);
-    switch (data) {
-      case intent1:
-        //Intent1 function goes here
-      break;
-      case intent2:
-        //Intent2 function goes here
-      break;
-      case intent3:
-        //Intent3 function goes here
-      break;
-      default:
-        conv.close("Sorry, i did not understand, could you repeat?")
-    }
+    let request = new Request();
+    let input = "How is the weather going to be today?";
+    
+
+    conv.ask("Surely! What do you want?");
+    conv.ask(data);
+    // switch (data) {
+    //   case intent1:
+    //     //Intent1 function goes here
+    //   break;
+    //   case intent2:
+    //     //Intent2 function goes here
+    //   break;
+    //   case intent3:
+    //     //Intent3 function goes here
+    //   break;
+    //   default:
+    //     conv.close("Sorry, i did not understand, could you repeat?")
+    // }
 });
 
 app.intent('Let me login', (conv) => {
