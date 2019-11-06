@@ -7,13 +7,11 @@ const app = dialogflow({ debug: true });
 const request = require('./connection/request');
 
 
-app.intent('Let me make a request', (conv) => {
+app.intent('Let me make a request', async (conv) => {
     let input = "How is the weather going to be today?";
     conv.ask("Surely! What do you want?");
-    data = request.get(input).data;
-    conv.ask(new SimpleResponse({
-      text: data,
-    }));
+    data = await request.get(input);
+    conv.ask(JSON.stringify(data))
     // switch (data) {
     //   case intent1:
     //     //Intent1 function goes here
