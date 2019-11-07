@@ -12,19 +12,19 @@ app.intent('Let me make a request', async (conv) => {
     conv.ask("Surely! What do you want?");
     data = await request.get(input);
     conv.ask(JSON.stringify(data))
-    // switch (data) {
-    //   case intent1:
-    //     //Intent1 function goes here
-    //   break;
-    //   case intent2:
-    //     //Intent2 function goes here
-    //   break;
-    //   case intent3:
-    //     //Intent3 function goes here
-    //   break;
-    //   default:
-    //     conv.close("Sorry, i did not understand, could you repeat?")
-    // }
+    switch (data.code) {
+      case 0:
+        
+      break;
+      case 1:
+        //Intent2 function goes here
+      break;
+      case 2:
+        //Intent3 function goes here
+      break;
+      default:
+        conv.close("Sorry, i did not understand, could you repeat?")
+    }
 });
 
 app.intent('Goodbye', conv => {
