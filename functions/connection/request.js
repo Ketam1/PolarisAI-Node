@@ -1,12 +1,12 @@
 const axios = require('axios');
-const API_URL = 'https://polarisai.azurewebsites.net/query/';
+
 
 
 
 module.exports = {
 
-  get: async function (query) {
-    return await axios.get(API_URL + query).then(response => {
+  get: async function (query, url) {
+    return await axios.get(url + query).then(response => {
       return response.data;
     }).catch(error => {
       return "API error.";
