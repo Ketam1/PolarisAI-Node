@@ -36,7 +36,7 @@ app.intent('Default Fallback Intent', async (conv) => {
 
 
     switch (data.code) {
-      case ADD_REMINDER:
+      case ADD_REMINDER_R:
           actions.addReminder(conv, data);
       break;
 
