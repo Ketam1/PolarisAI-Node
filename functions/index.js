@@ -1,8 +1,7 @@
 // Node.js modules
-const {dialogflow, Permission, BasicCard, Button, Image} = require('actions-on-google');
+const {dialogflow, SimpleResponse, BasicCard, Image, Permission, Button} = require('actions-on-google');
 const functions = require('firebase-functions');
 const app = dialogflow({ debug: true });
-const {Card} = require('dialogflow-fulfillment');
 
 // Non-Node.js modules
 const request = require('./connection/request');
@@ -32,42 +31,36 @@ const WEATHER_UNIT = 'units=metric'
 
 
 app.intent('Default Fallback Intent', async (conv) => {
-    data = await request.get(POLARIS_API + conv.query);
-    let card;
+    const data = await request.get(POLARIS_API + conv.query);
+
+
     switch (data.code) {
       case ADD_REMINDER:
-          actions.addReminder(conv);
+          actions.addReminder(conv, data);
       break;
 
       case MAKE_CALL:
-        actions.makeCall(conv);
+        actions.makeCall(conv, data);
       break;
 
       case SHOW_WEATHER:
-      card = new Card('sample card title');
-      card.setImage('https://assistant.google.com/static/images/molecule/Molecule-Formation-stop.png');
-      card.setText('sampletext');
-      conv.ask(new SimpleResponse({
-        text: "sample voice speech",
-      }));
-      conv.ask(card);
         conv.ask(new Permission(location));
       break;
 
       case SHOW_NEWS:
-        actions.showNews(conv);
+        actions.showNews(conv, data);
       break;
 
       case ADD_ALARM:
-        actions.addAlarm(conv);
+        actions.addAlarm(conv, data);
       break;
 
       case SMALL_TALK:
-        actions.smallTalk(conv);
+        actions.smallTalk(conv, data);
       break;
 
       case EASTER_EGG:
-        actions.easterEgg(conv);
+        actions.easterEgg(conv, data);
       break;
     }
 });
@@ -75,15 +68,16 @@ app.intent('Default Fallback Intent', async (conv) => {
 app.intent('Get Permission', async (conv, granted) => {
   if(granted){
     let city = conv.device.location.city;
-    weatherData = await request.get(WEATHER_API + (city + "&" + WEATHER_ID + "&" + WEATHER_UNIT));
-
+    let query =  city + "&" + WEATHER_ID + "&" + WEATHER_UNIT;
+    let weatherData = await request.get(WEATHER_API + query);
+    actions.showWeather(conv, weatherData, city);
   }
   else
     conv.close("I was not capable to get location to show weather");
-})
+});
 
 app.intent('Goodbye', conv => {
   conv.close('See you later!')
-})
+});
 
 exports.fulfillment = functions.https.onRequest(app);
