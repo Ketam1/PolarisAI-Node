@@ -8,7 +8,8 @@ const request = require('./connection/request');
 const actions = require('./actions/actions');
 
 // Constants for intents code
-const ADD_REMINDER = 0;
+const ADD_REMINDER_R = 31;
+const ADD_REMINDER_N = 31;
 const MAKE_CALL    = 1;
 const SHOW_WEATHER = 51;
 const SHOW_NEWS    = 61;
