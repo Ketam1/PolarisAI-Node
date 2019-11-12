@@ -74,7 +74,7 @@ app.intent('Get Permission', async (conv, granted) => {
     actions.showWeather(conv, weatherData, city);
   }
   else
-    conv.close("I was not capable to get location to show weather");
+    conv.ask("I was not capable to get location to show weather");
 });
 
 app.intent('Goodbye', conv => {

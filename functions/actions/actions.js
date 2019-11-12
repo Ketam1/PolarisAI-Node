@@ -21,15 +21,14 @@ module.exports = {
     let weatherMain = weatherData.main;
     let weatherDesc = weatherData.weather[0];
     conv.ask(new SimpleResponse({
-        speech: 'The weather is going to have a'
+        speech: 'The weather is going to be '
         + weatherDesc.description + '  \n'
         + 'The maximum temperature today is going to be '
         + weatherMain.temp_max + '°C  \n'
         + 'and the minimum temperature is going to be '
         + weatherMain.temp_min + '°C  \n',
     }));
-
-    // Card Response
+    
     conv.ask(new BasicCard({
         title: 'Weather for ' + city,
         image: new Image({
