@@ -1,10 +1,7 @@
 const request = require('./../connection/request');
-const { dialogflow,
-      SimpleResponse,
-      BasicCard,
-      Image,
-      Permission,
-      Button } = require('actions-on-google');
+const { dialogflow, SimpleResponse, BasicCard, Image, Permission,
+        Button, BrowseCarousel, BrowseCarouselItem
+      } = require('actions-on-google');
 
 
 module.exports = {
@@ -28,7 +25,7 @@ module.exports = {
         + 'and the minimum temperature is going to be '
         + weatherMain.temp_min + '°C  \n',
     }));
-    
+
     conv.ask(new BasicCard({
         title: 'Weather for ' + city,
         image: new Image({
@@ -46,8 +43,46 @@ module.exports = {
 
   },
 
-  showNews: function (conv, data) {
-    conv.ask(data.response);
+  showNews: function (conv, newsData, data) {
+    let articles = newsData.articles;
+    conv.ask(new SimpleResponse({
+        speech: 'The top headlines of the moment are'
+        + articles[0].title + ' '
+        + articles[1].title + ' '
+        + articles[2].title + ' ',
+        text: " ",
+    }));
+    conv.ask(new BrowseCarousel({
+    items: [
+      new BrowseCarouselItem({
+        title: articles[0].title,
+        url: articles[0].url,
+        description: articles[0].description,
+        image: new Image({
+          url: articles[0].urlToImage,
+        }),
+        footer: 'Fonte: '+ articles[0].source.name,
+      }),
+      new BrowseCarouselItem({
+        title: articles[1].title,
+        url: articles[1].url,
+        description: articles[1].description,
+        image: new Image({
+          url: articles[1].urlToImage,
+        }),
+        footer: 'Fonte: '+ articles[1].source.name,
+      }),
+      new BrowseCarouselItem({
+        title: articles[2].title,
+        url: articles[2].url,
+        description: articles[2].description,
+        image: new Image({
+          url: articles[2].urlToImage,
+        }),
+        footer: 'Fonte: '+ articles[2].source.name,
+      }),
+    ],
+  }));
   },
 
   addAlarm: function (conv, data) {
