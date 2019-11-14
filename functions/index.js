@@ -1,19 +1,23 @@
 // Node.js modules
-const {dialogflow, SimpleResponse, BasicCard, Image, Permission, Button, UpdatePermission} = require('actions-on-google');
+const {dialogflow, SimpleResponse, BasicCard, Image, Permission, Button,
+      UpdatePermission, LinkOutSuggestion, SignIn} = require('actions-on-google');
 const functions = require('firebase-functions');
 const app = dialogflow({ debug: true });
+const {google} = require('googleapis');
 
 // Non-Node.js modules
-const request = require('./connection/request');
-const actions = require('./actions/actions');
+const request = require('./connection/request.js');
+const actions = require('./actions/actions.js');
 
 // Constants for intents code
 const ADD_REMINDER_R = 31;
 const ADD_REMINDER_N = 32;
-const MAKE_CALL    = 1;
+const MAKE_CALL_R    = 11;
+const MAKE_CALL_N    = 12;
 const SHOW_WEATHER = 51;
 const SHOW_NEWS    = 61;
-const ADD_ALARM    = 4;
+const ADD_ALARM_R    = 41;
+const ADD_ALARM_N    = 42;
 const SMALL_TALK   = 2;
 const EASTER_EGG   = 6;
 
@@ -21,10 +25,6 @@ const EASTER_EGG   = 6;
 const location = {
   context: 'For this I will need to know your location',
   permissions: 'DEVICE_COARSE_LOCATION'
-}
-
-const notification = {
-  intent: 'Notification',
 }
 
 // Constants for API's
@@ -37,21 +37,29 @@ const NEWS_API = 'http://newsapi.org/v2/top-headlines?';
 const NEWS_ID = 'apiKey=253bdfcd7cb24278806507d0bf81d9f5';
 const NEWS_COUNTRY = "country=us";
 
+const CALENDAR_API = 'https://www.googleapis.com/calendar/v3/calendars/';
+const CALENDAR_KEY = 'AIzaSyAZ-ToJ0MXPFyWGmiS74YA2JQv1GVMKsTk';
+const CALENDAR_ID = "9266lr7jq0v7jblslfhq3lfpt8@group.calendar.google.com";
+const CALENDAR_QUERY = CALENDAR_ID + '/events?key=' + CALENDAR_KEY
 
 
 app.intent('Default Fallback Intent', async (conv) => {
-    const data = await request.get(POLARIS_API + conv.query);
-    let newsData;
+    const data = await request.get(POLARIS_API, conv.query);
+    let newsData, calendarData;
 
 
     switch (data.code) {
       case ADD_REMINDER_R:
-          conv.ask(new UpdatePermission(notification));
-
+        calendarData = await request.get (CALENDAR_API, CALENDAR_QUERY);
+        actions.addReminder(conv, calendarData, data);
       break;
 
-      case MAKE_CALL:
+      case MAKE_CALL_R:
         actions.makeCall(conv, data);
+      break;
+
+      case MAKE_CALL_N:
+        conv.close(data.response);
       break;
 
       case SHOW_WEATHER:
@@ -59,13 +67,17 @@ app.intent('Default Fallback Intent', async (conv) => {
       break;
 
       case SHOW_NEWS:
-        newsData = await request.get(NEWS_API + (NEWS_COUNTRY + '&' + NEWS_ID));
+        newsData = await request.get(NEWS_API ,(NEWS_COUNTRY + '&' + NEWS_ID));
         actions.showNews(conv, newsData, data);
       break;
 
-      case ADD_ALARM:
+      case ADD_ALARM_R:
         actions.addAlarm(conv, data);
       break;
+
+      case ADD_ALARM_N:
+        conv.close(data.response);
+      break
 
       case SMALL_TALK:
         actions.smallTalk(conv, data);
@@ -77,9 +89,8 @@ app.intent('Default Fallback Intent', async (conv) => {
     }
 });
 
-app.intent('Get Permission', async (conv, granted) => {
+app.intent('Get_location_permission', async (conv, granted) => {
   if(granted){
-    conv.ask("zada");
     let city = conv.device.location.city;
     let query =  city + "&" + WEATHER_ID + "&" + WEATHER_UNIT;
     let weatherData = await request.get(WEATHER_API + query);
@@ -88,6 +99,7 @@ app.intent('Get Permission', async (conv, granted) => {
   else
     conv.ask("I was not capable to get permissions to do that.");
 });
+
 
 app.intent('Goodbye', conv => {
   conv.close('See you later!')

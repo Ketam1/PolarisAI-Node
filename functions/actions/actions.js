@@ -2,16 +2,60 @@ const request = require('./../connection/request');
 const { dialogflow, SimpleResponse, BasicCard, Image, Permission,
         Button, BrowseCarousel, BrowseCarouselItem
       } = require('actions-on-google');
+const {google} = require('googleapis');
 
+
+function formatData(calendarData){
+  calendarData = calendarData.split('T')[1];
+  calendarData = calendarData.split('-')[0];
+  return calendarData.substr(0, calendarData.length-3);
+}
 
 module.exports = {
-
-  addReminder: function (conv, data) {
-    conv.ask(data.response);
+  addReminder: function (conv, calendarData, data) {
+    calendarData = calendarData.items;
+    conv.ask(new SimpleResponse({
+      speech: data.response,
+      text: data.response + '  \nsome other things you might want to remember',
+    }));
+    conv.ask(new BrowseCarousel({
+    items: [
+      new BrowseCarouselItem({
+        title: calendarData[0].summary,
+        url: calendarData[0].htmlLink,
+        description: 'Starts at: ' + formatData(calendarData[0].start.dateTime),
+        image: new Image({
+          url: 'https://png.pngtree.com/png-vector/20190819/ourlarge/pngtree-exclamation-mark-icon-vector-illustration-png-image_1694367.jpg',
+        }),
+        footer: 'Status: '+ calendarData[0].status,
+      }),
+      new BrowseCarouselItem({
+        title: calendarData[1].summary,
+        url: calendarData[1].htmlLink,
+        description: 'Starts at: ' + formatData(calendarData[1].start.dateTime),
+        image: new Image({
+          url: 'https://png.pngtree.com/png-vector/20190819/ourlarge/pngtree-exclamation-mark-icon-vector-illustration-png-image_1694367.jpg',
+        }),
+        footer: 'Status: '+ calendarData[1].status,
+      }),
+      new BrowseCarouselItem({
+        title: calendarData[2].summary,
+        url: calendarData[2].htmlLink,
+        description: 'Starts at: ' + formatData(calendarData[2].start.dateTime),
+        image: new Image({
+          url: 'https://png.pngtree.com/png-vector/20190819/ourlarge/pngtree-exclamation-mark-icon-vector-illustration-png-image_1694367.jpg',
+        }),
+        footer: 'Status: '+ calendarData[2].status,
+      }),
+    ],
+  }));
   },
 
   makeCall: function (conv, data) {
-    conv.ask(data.response);
+    conv.ask(new SimpleResponse({
+      text: data.response,
+      speech: data.response,
+    }));
   },
 
   showWeather: function (conv, weatherData, city) {
@@ -86,7 +130,10 @@ module.exports = {
   },
 
   addAlarm: function (conv, data) {
-    conv.ask(data.response);
+    conv.ask(new SimpleResponse({
+      text: data.response,
+      speech: data.response,
+    }));
   },
 
   smallTalk: function (conv, data) {

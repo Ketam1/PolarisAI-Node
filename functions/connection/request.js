@@ -1,11 +1,8 @@
 const axios = require('axios');
 
-
-
-
 module.exports = {
 
-  get: async function (query, url) {
+  get: async function (url, query) {
     return await axios.get(url + query).then(response => {
       return response.data;
     }).catch(error => {
@@ -15,6 +12,6 @@ module.exports = {
 
   post: function (query) {
     return "POST is not implemented yet";
-  }
+  },
 
 };
